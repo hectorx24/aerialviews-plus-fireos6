@@ -3,6 +3,9 @@
 Fork of [naveeneppalapally/AerialViews-Plus](https://github.com/naveeneppalapally/AerialViews-Plus) (GPLv3, see `LICENSE` and `CREDITS.md`)
 tested on a Fire TV Stick 4K gen 1 (Fire OS 6.7, Android 7.1). Separate from the MIT-licensed Free My TV launcher.
 
+![Glass clock and weather](docs/screenshots/glass-clock-weather.jpg)
+![YouTube settings](docs/screenshots/youtube-settings.jpg)
+
 ## What changes
 - Own application id (`com.hectorx24.aerialviewsplus`), installs next to the original Aerial Views; Firebase/analytics removed (F-Droid flavor).
 - **Mix by share** (Settings > Sources > YouTube): *Porcentaje de YouTube* (default 43 %), *Porcentaje de tus enlaces* (default 7 %); the rest is Apple TV etc.
@@ -20,3 +23,6 @@ Unit test: `./gradlew :app:testFdroidDebugUnitTest --tests '*YouTubeShareTest*'`
 
 ## Power timers on Fire OS (outside this app)
 `settings put system screen_off_timeout <ms>` starts the screensaver; `settings put secure sleep_timeout <ms>` puts the device to sleep (Fire OS then sends HDMI-CEC standby). Aerial's own black-out timer tops out at 60 min.
+
+## Weather
+A small weather widget (icon and temperature, same glass style as the clock) sits in the bottom-right corner. It uses [Open-Meteo](https://open-meteo.com), which needs no API key; the location is set in the weather settings. With an OpenWeather key in the build, OpenWeather is used instead.

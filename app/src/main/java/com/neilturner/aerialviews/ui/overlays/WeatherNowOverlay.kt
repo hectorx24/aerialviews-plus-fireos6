@@ -63,8 +63,8 @@ class WeatherNowOverlay
             weight: String,
         ) {
             this.font = font
-            // Glass look (as the clock): the same condensed face, translucent white, in proportion to the clock.
-            this.size = if (GeneralPrefs.clockGlass) 40f else size
+            // Glass look (as the clock): the same condensed face and translucent white, at the size it always had.
+            this.size = if (GeneralPrefs.clockGlass) 28f else size
             this.weight = weight
         }
 

@@ -55,6 +55,10 @@ class YouTubeMediaProvider(
     private fun withPinned(media: List<AerialMedia>): List<AerialMedia> {
         if (media.isEmpty()) return media
         val present = media.mapNotNull { it.metadata.exif.description }.toSet()
+        // "Play now" on one of the links: resolve its stream while the playlist is still being built.
+        YouTubeVideoPrefs.startWith.takeIf { it.isNotBlank() }?.let { id ->
+            repository.preResolveVideo("https://www.youtube.com/watch?v=$id", providerScope)
+        }
         val extra =
             EndCutPolicy.pinnedIds(context).filter { it !in present }.map { videoId ->
                 AerialMedia(
