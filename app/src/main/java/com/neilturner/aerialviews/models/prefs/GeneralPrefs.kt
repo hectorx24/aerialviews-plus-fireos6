@@ -224,7 +224,7 @@ object GeneralPrefs : KotprefModel() {
 
     // Playlist - Videos
     var playlistAudioMode by nullableEnumValuePref(PlaylistAudioMode.VIDEO_MUTED, "playlist_audio_mode")
-    var videoVolume by stringPref("100", "video_volume")
+    var videoVolume by stringPref("0", "video_volume")
     var videoScale by nullableEnumValuePref(VideoScale.SCALE_TO_FIT_WITH_CROPPING, "video_scale")
     var playbackSpeed by stringPref("1", "playback_speed")
     var ignoreNonManifestVideos by booleanPref(false, "any_videos_ignore_non_manifest_videos")

@@ -63,7 +63,8 @@ class WeatherNowOverlay
             weight: String,
         ) {
             this.font = font
-            this.size = size
+            // Glass look (as the clock): the same condensed face, translucent white, in proportion to the clock.
+            this.size = if (GeneralPrefs.clockGlass) 40f else size
             this.weight = weight
         }
 
@@ -187,7 +188,13 @@ class WeatherNowOverlay
                         }
 
                         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, size)
-                        textView.typeface = FontHelper.getTypeface(context, GeneralPrefs.fontTypeface, weight)
+                        textView.typeface = glassOr { FontHelper.getTypeface(context, GeneralPrefs.fontTypeface, weight) }
+                        if (GeneralPrefs.clockGlass) {
+                            textView.setTextColor(android.graphics.Color.argb(105, 255, 255, 255))
+                            textView.setShadowLayer(0f, 0f, 0f, 0)
+                            textView.includeFontPadding = false
+                            textView.letterSpacing = 0.04f
+                        }
                         textView.layoutParams = params
 
                         Timber.d("Adding text view with text: ${item.text}")
@@ -206,6 +213,7 @@ class WeatherNowOverlay
 
                         imageView.layoutParams = params
                         imageView.scaleType = ImageView.ScaleType.FIT_CENTER
+                        if (GeneralPrefs.clockGlass) imageView.alpha = 0.45f
 
                         addView(imageView)
                     }
@@ -213,13 +221,20 @@ class WeatherNowOverlay
             }
         }
 
+        private fun glassOr(other: () -> android.graphics.Typeface?): android.graphics.Typeface? =
+            if (GeneralPrefs.clockGlass) {
+                android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.NORMAL)
+            } else {
+                other()
+            }
+
         private fun calculateIconSize(size: Float): Int {
             // Get text metrics for the given size
             val textPaint =
                 TextView(context)
                     .apply {
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, size)
-                        typeface = FontHelper.getTypeface(context, GeneralPrefs.fontTypeface, weight)
+                        typeface = glassOr { FontHelper.getTypeface(context, GeneralPrefs.fontTypeface, weight) }
                     }.paint
 
             // Calculate approximate text height based on text metrics

@@ -24,6 +24,25 @@ class OverlayHelper(
     private val context: Context,
     private val prefs: GeneralPrefs,
 ) {
+    init {
+        applyFireOsDefaults()
+    }
+
+    /** Once: small weather widget in the bottom-right corner (Open-Meteo, no key), muted by default (volume 0; raise it in Playlist > Volume). */
+    private fun applyFireOsDefaults() {
+        val store = context.getSharedPreferences("fireos_defaults", Context.MODE_PRIVATE)
+        if (store.getBoolean("v2", false)) return
+        GeneralPrefs.slotBottomRight1 = OverlayType.WEATHER1
+        GeneralPrefs.weatherLine1Layout = "ICON,TEMPERATURE"
+        if (GeneralPrefs.weatherLocationLat.isBlank()) {
+            GeneralPrefs.weatherLocationLat = "26.910833"
+            GeneralPrefs.weatherLocationLon = "-109.625278"
+            GeneralPrefs.weatherLocationCustomName = "Etchojoa"
+        }
+        GeneralPrefs.videoVolume = "0"
+        store.edit().putBoolean("v2", true).apply()
+    }
+
     var overlays = mutableListOf<View?>()
     var isHidden = false
 

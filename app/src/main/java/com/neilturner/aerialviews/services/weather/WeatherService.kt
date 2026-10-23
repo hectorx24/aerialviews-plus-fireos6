@@ -219,7 +219,7 @@ class WeatherService(
         val units = GeneralPrefs.weatherTemperatureUnits?.toString()?.lowercase() ?: "metric"
         val language = WeatherLanguage.getLanguageCode(context)
 
-        if (key.isEmpty() || lat == null || lon == null) {
+        if (lat == null || lon == null) {
             Timber.e("Invalid location coordinates")
             return null
         }
@@ -296,11 +296,67 @@ class WeatherService(
         )
     }
 
+    /** Without an OpenWeather key the weather comes from Open-Meteo, which needs none. */
+    private fun fetchOpenMeteo(config: WeatherRequestConfig): CurrentWeatherResponse? =
+        try {
+            val url =
+                java.net.URL(
+                    "https://api.open-meteo.com/v1/forecast?latitude=${config.lat}&longitude=${config.lon}" +
+                        "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day" +
+                        "&temperature_unit=${if (config.units == "imperial") "fahrenheit" else "celsius"}",
+                )
+            val connection = (url.openConnection() as java.net.HttpURLConnection).apply {
+                connectTimeout = 8000
+                readTimeout = 8000
+            }
+            val current = org.json.JSONObject(connection.inputStream.bufferedReader().use { it.readText() }).getJSONObject("current")
+            connection.disconnect()
+            val code = current.getInt("weather_code")
+            val day = current.optInt("is_day", 1) == 1
+            val (id, main, text) = openMeteoCondition(code)
+            val icon = (if (code == 0) "01" else if (code <= 2) "02" else if (code == 3) "04" else if (code in 45..48) "50" else if (code in 51..67 || code in 80..82) "10" else if (code in 71..77 || code in 85..86) "13" else "11") + if (day) "d" else "n"
+            CurrentWeatherResponse(
+                weather = listOf(Weather(id = id, main = main, description = text, icon = icon)),
+                main =
+                    MainWeatherData(
+                        temp = current.getDouble("temperature_2m"),
+                        feelsLike = current.getDouble("temperature_2m"),
+                        tempMin = current.getDouble("temperature_2m"),
+                        tempMax = current.getDouble("temperature_2m"),
+                        pressure = 0,
+                        humidity = current.optInt("relative_humidity_2m", 0),
+                    ),
+                wind = Wind(speed = current.optDouble("wind_speed_10m", 0.0), deg = 0),
+                name = "",
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Open-Meteo request failed")
+            null
+        }
+
+    /** WMO weather code -> (OpenWeather id for the icon, group, description). */
+    private fun openMeteoCondition(code: Int): Triple<Int, String, String> =
+        when (code) {
+            0 -> Triple(800, "Clear", "Despejado")
+            1 -> Triple(801, "Clouds", "Mayormente despejado")
+            2 -> Triple(802, "Clouds", "Parcialmente nublado")
+            3 -> Triple(804, "Clouds", "Nublado")
+            45, 48 -> Triple(741, "Fog", "Niebla")
+            in 51..57 -> Triple(300, "Drizzle", "Llovizna")
+            in 61..65 -> Triple(500, "Rain", "Lluvia")
+            66, 67 -> Triple(511, "Rain", "Lluvia helada")
+            in 71..77 -> Triple(600, "Snow", "Nieve")
+            in 80..82 -> Triple(521, "Rain", "Chubascos")
+            85, 86 -> Triple(620, "Snow", "Chubascos de nieve")
+            else -> Triple(211, "Thunderstorm", "Tormenta")
+        }
+
     private suspend fun fetchCurrentWeatherResponse(
         config: WeatherRequestConfig,
         attempt: Int,
     ): CurrentWeatherResponse? =
         try {
+            if (config.apiKey.isBlank()) return fetchOpenMeteo(config)
             val response =
                 openWeatherClient.getCurrentWeather(
                     lat = config.lat,

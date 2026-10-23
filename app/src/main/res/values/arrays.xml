@@ -1225,7 +1225,7 @@
         <item>95</item>
     </string-array>
     <string name="brightness_default" translatable="false">100</string>
-    <string name="volume_default" translatable="false">100</string>
+    <string name="volume_default" translatable="false">0</string>
     <string name="random_start_position_range_default" translatable="false">50</string>
 
     <!-- Immich -->
