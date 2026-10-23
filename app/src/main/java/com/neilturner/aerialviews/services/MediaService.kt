@@ -275,9 +275,20 @@ class MediaService(
 
             if (config.shuffleVideos) {
                 filteredMedia = weightedInterleavedShuffle(filteredMedia)
-                val youtubeMixWeight = YouTubeVideoPrefs.mixWeight.toIntOrNull() ?: 1
-                filteredMedia = MediaServiceHelper.applyYouTubeMixWeight(filteredMedia, youtubeMixWeight)
-                Timber.i("Shuffling media items with weighted source interleaving (YouTube mix weight %s)", youtubeMixWeight)
+                val youtubeShare = com.neilturner.aerialviews.providers.youtube.EndCutPolicy.sharePercent(context) ?: (YouTubeVideoPrefs.sharePercent.toIntOrNull() ?: 43)
+                filteredMedia =
+                    MediaServiceHelper.applyYouTubeShare(
+                        filteredMedia,
+                        youtubeShare,
+                        com.neilturner.aerialviews.providers.youtube.EndCutPolicy.pinnedIds(context).toSet(),
+                        com.neilturner.aerialviews.providers.youtube.EndCutPolicy.pinnedPercent(context),
+                    )
+                YouTubeVideoPrefs.startWith.takeIf { it.isNotBlank() }?.let { id ->
+                    val at = filteredMedia.indexOfFirst { it.metadata.exif.description == id }
+                    if (at > 0) filteredMedia = listOf(filteredMedia[at]) + filteredMedia.filterIndexed { i, _ -> i != at }
+                    YouTubeVideoPrefs.startWith = ""
+                }
+                android.util.Log.i("MediaService", "Playlist of ${filteredMedia.size} items, YouTube ${filteredMedia.count { it.source == com.neilturner.aerialviews.models.enums.AerialMediaSource.YOUTUBE }} (share setting $youtubeShare%)")
             }
 
             val musicPlaylist =

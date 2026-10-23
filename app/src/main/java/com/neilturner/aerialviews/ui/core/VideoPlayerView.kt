@@ -177,7 +177,7 @@ class VideoPlayerView
                     Log.i("VideoPlayerView", "Preparing media source: ${playableMedia.uri}")
                     configureTrackSelection(playableMedia)
                     if (playableMedia.source == AerialMediaSource.YOUTUBE) {
-                        val playbackParams = VideoPlayerHelper.calculatePlaybackParameters(exoPlayer, playableMedia, GeneralPrefs)
+                        val playbackParams = VideoPlayerHelper.calculatePlaybackParameters(exoPlayer, playableMedia, GeneralPrefs, context)
                         state.startPosition = playbackParams.first
                         state.endPosition = playbackParams.second
                     }

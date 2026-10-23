@@ -199,6 +199,7 @@ class OverlayHelper(
                 ClockOverlay(context).apply {
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, prefs.clockSize.toFloat())
                     typeface = FontHelper.getTypeface(context, prefs.fontTypeface, prefs.clockWeight)
+                    if (com.neilturner.aerialviews.models.prefs.GeneralPrefs.clockGlass) applyGlassStyle()
                 }
             }
 

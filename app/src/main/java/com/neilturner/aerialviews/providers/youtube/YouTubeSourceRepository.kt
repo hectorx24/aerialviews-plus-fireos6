@@ -3323,7 +3323,7 @@ class YouTubeSourceRepository(
         const val DEFAULT_CATEGORY_NATURE = true
         const val DEFAULT_CATEGORY_ANIMALS = true
         const val DEFAULT_CATEGORY_DRONE = true
-        const val DEFAULT_CATEGORY_CITIES = true
+        const val DEFAULT_CATEGORY_CITIES = false
         const val DEFAULT_CATEGORY_SPACE = true
         const val DEFAULT_CATEGORY_OCEAN = true
         const val DEFAULT_CATEGORY_WEATHER = true

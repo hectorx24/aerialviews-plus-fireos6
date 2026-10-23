@@ -133,6 +133,39 @@
                     app:defaultValue="@string/youtube_playback_max_minutes_default"
                     app:useSimpleSummaryProvider="true" />
 
+                <ListPreference
+                    app:dependency="yt_enabled"
+                    app:key="yt_share_percent"
+                    app:title="Porcentaje de YouTube"
+                    app:summary="Parte del total que son vídeos de YouTube (el resto, de las demás fuentes, p. ej. Apple TV)"
+                    app:entries="@array/yt_share_entries"
+                    app:entryValues="@array/yt_share_values"
+                    app:defaultValue="43"
+                    app:useSimpleSummaryProvider="false" />
+
+                <ListPreference
+                    app:dependency="yt_enabled"
+                    app:key="yt_pinned_percent"
+                    app:title="Porcentaje de tus enlaces"
+                    app:summary="Parte del total que son tus enlaces personalizados (se repiten espaciados)"
+                    app:entries="@array/yt_pinned_entries"
+                    app:entryValues="@array/yt_pinned_values"
+                    app:defaultValue="7" />
+
+                <Preference
+                    app:dependency="yt_enabled"
+                    app:key="yt_play_now"
+                    app:title="Reproducir uno de mis enlaces ahora"
+                    app:summary="Elige uno y se abre el salvapantallas empezando por él" />
+
+                <EditTextPreference
+                    app:dependency="yt_enabled"
+                    app:key="yt_custom_links"
+                    app:title="Mis enlaces de YouTube"
+                    app:summary="Uno por línea: enlace y, opcional, dónde cortar (1:30). Sin tiempo se corta solo con SponsorBlock (outro, autopromoción)."
+                    app:dialogTitle="Un enlace por línea, ej.: https://youtu.be/xBSG2hZXTF0 1:30"
+                    app:defaultValue="https://youtu.be/JqUsUe6B43g 1:30&#10;https://youtu.be/xBSG2hZXTF0 1:30" />
+
                 <Preference
                     app:key="yt_mix_weight_link"
                     app:title="@string/youtube_mix_weight_title"

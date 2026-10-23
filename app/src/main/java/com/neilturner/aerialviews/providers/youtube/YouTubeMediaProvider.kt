@@ -43,12 +43,32 @@ class YouTubeMediaProvider(
         // Signature/version refresh can run in background, but should not block initial playback.
         val startupCachedEntries = repository.getCachedVideosSnapshot()
         if (startupCachedEntries.isEmpty()) {
-            return ProviderFetchResult.Success(media = fetchInitialMedia(), summary = "")
+            return ProviderFetchResult.Success(media = withPinned(fetchInitialMedia()), summary = "")
         }
 
         Log.i(TAG, "Using local startup cache entries=${startupCachedEntries.size}")
         repository.preWarmInBackground()
-        return ProviderFetchResult.Success(media = startupCachedEntries.toAerialMedia(), summary = "")
+        return ProviderFetchResult.Success(media = withPinned(startupCachedEntries.toAerialMedia()), summary = "")
+    }
+
+    /** The pinned clips (EndCutPolicy.pinnedIds) always belong to the YouTube offer; the mix keeps them rare. */
+    private fun withPinned(media: List<AerialMedia>): List<AerialMedia> {
+        if (media.isEmpty()) return media
+        val present = media.mapNotNull { it.metadata.exif.description }.toSet()
+        val extra =
+            EndCutPolicy.pinnedIds(context).filter { it !in present }.map { videoId ->
+                AerialMedia(
+                    uri = "https://www.youtube.com/watch?v=$videoId".toUri(),
+                    type = AerialMediaType.VIDEO,
+                    source = AerialMediaSource.YOUTUBE,
+                    metadata =
+                        AerialMediaMetadata(
+                            shortDescription = "YouTube",
+                            exif = AerialExifMetadata(description = videoId, durationSeconds = 0),
+                        ),
+                )
+            }
+        return media + extra
     }
 
     override suspend fun fetchMetadata(media: List<AerialMedia>): List<AerialMedia> = media

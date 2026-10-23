@@ -37,6 +37,7 @@ object GeneralPrefs : KotprefModel() {
     var clockFormat by nullableEnumValuePref(ClockType.DEFAULT, "clock_format")
     var clockSize by stringPref("18", "clock_size")
     var clockWeight by stringPref("300", "clock_weight")
+    var clockGlass by booleanPref(true, "clock_glass")
     var clockForceLatinDigits by booleanPref(false, "clock_force_latin_digits")
 
     // Music

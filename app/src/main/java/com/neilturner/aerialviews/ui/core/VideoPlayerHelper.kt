@@ -42,6 +42,7 @@ import com.neilturner.aerialviews.providers.webdav.WebDavDataSourceFactory
 import com.neilturner.aerialviews.providers.webdav.WebDavHostParser
 import com.neilturner.aerialviews.providers.webdav.defaultPortFor
 import com.neilturner.aerialviews.providers.youtube.NewPipeHelper
+import com.neilturner.aerialviews.providers.youtube.EndCutPolicy
 import com.neilturner.aerialviews.providers.youtube.SegmentMaskEngine
 import com.neilturner.aerialviews.services.philips.CustomRendererFactory
 import timber.log.Timber
@@ -361,6 +362,23 @@ object VideoPlayerHelper {
     }
 
     fun calculatePlaybackParameters(
+        player: ExoPlayer,
+        media: AerialMedia,
+        prefs: GeneralPrefs,
+        context: Context? = null,
+    ): Pair<Long, Long> {
+        val raw = calculateRawPlaybackParameters(player, media, prefs)
+        if (context == null || media.source != AerialMediaSource.YOUTUBE) return raw
+        val videoId = media.metadata.exif.description ?: return raw
+        val durationMs = if (player.duration > 0) player.duration else (media.metadata.exif.durationSeconds?.toLong()?.times(1000) ?: 0L)
+        val cut = EndCutPolicy.endPositionMs(context, videoId, durationMs) ?: return raw
+        val end = if (raw.second in 1 until cut) raw.second else cut
+        val start = if (raw.first >= end - 5_000L) 0L else raw.first
+        android.util.Log.i("EndCut", "$videoId: stops at ${end}ms (starts at ${start}ms, raw ${raw.first}-${raw.second}, duration ${durationMs}ms)")
+        return Pair(start, end)
+    }
+
+    private fun calculateRawPlaybackParameters(
         player: ExoPlayer,
         media: AerialMedia,
         prefs: GeneralPrefs,

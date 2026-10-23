@@ -16,6 +16,18 @@ class ClockOverlay : TextClock {
         TextViewCompat.setTextAppearance(this, R.style.OverlayText)
     }
 
+    /** Tall, condensed, large, one uniform translucent white: it takes whatever the video behind it gives, no painted gradient. */
+    fun applyGlassStyle() {
+        typeface = android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.BOLD)
+        setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 96f)
+        setTextColor(android.graphics.Color.argb(150, 255, 255, 255))
+        setShadowLayer(0f, 0f, 0f, 0)
+        includeFontPadding = false
+        pivotX = 0f
+        scaleY = 1.35f
+        letterSpacing = 0.02f
+    }
+
     fun updateFormat(format: ClockType?) {
         when (format) {
             ClockType.HOUR_24 -> {

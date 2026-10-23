@@ -3,13 +3,10 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.android.junit5)
-    alias(libs.plugins.firebase.crashlytics)
-    alias(libs.plugins.firebase.perf)
     alias(libs.plugins.kotlinter.gradle)
     alias(libs.plugins.baselineprofile)
 }
@@ -35,11 +32,11 @@ android {
             System.getenv("OPEN_WEATHER_DEBUG"),
         ).firstOrNull { !it.isNullOrBlank() } ?: ""
     defaultConfig {
-        applicationId = "com.naveen.aerialviewsplus"
+        applicationId = "com.hectorx24.aerialviewsplus"
         minSdk = 23 // Android v6
         targetSdk = 37
         versionCode = 104
-        versionName = "1.2"
+        versionName = "1.2-fireos6"
         betaVersion = "-beta12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -95,6 +95,44 @@ internal object MediaServiceHelper {
         return result
     }
 
+    /**
+     * The playlist as a mix by share of the whole: `sharePercent` regular YouTube videos, `pinnedPercent` for the pinned
+     * clips (EndCutPolicy.pinnedIds, repeated as often as that needs, spread out), the rest from the other sources.
+     * Per pass only as many YouTube videos as those shares need are picked, spread at random.
+     */
+    fun applyYouTubeShare(
+        media: List<AerialMedia>,
+        sharePercent: Int,
+        pinnedIds: Set<String>,
+        pinnedPercent: Int = 7,
+        random: Random = Random.Default,
+    ): List<AerialMedia> {
+        if (media.isEmpty()) return emptyList()
+        val youtube = media.filter { it.source == AerialMediaSource.YOUTUBE }
+        val others = media.filter { it.source != AerialMediaSource.YOUTUBE }
+        if (youtube.isEmpty() || others.isEmpty()) return media.shuffled(random)
+        val (pinned, regular) = youtube.partition { it.metadata.exif.description in pinnedIds }
+        val pin = if (pinned.isEmpty()) 0.0 else pinnedPercent.coerceIn(0, 30) / 100.0
+        val share = if (regular.isEmpty()) 0.0 else sharePercent.coerceIn(0, 70) / 100.0
+        // The shares hold even when the YouTube pool is small: then fewer of the others are used in this pass (a random
+        // part of them), rather than repeating YouTube videos.
+        val wanted = Math.round(others.size / (1 - share - pin)).toInt()
+        val regularCount = Math.round(wanted * share).toInt().coerceAtMost(regular.size)
+        val total = if (share > 0 && regularCount < Math.round(wanted * share)) Math.round(regularCount / share).toInt() else wanted
+        val pinnedCount = if (pin > 0) Math.round(total * pin).toInt().coerceAtLeast(1) else 0
+        val otherCount = (total - regularCount - pinnedCount).coerceIn(1, others.size)
+        val chosen = mutableListOf<AerialMedia>()
+        chosen += regular.shuffled(random).take(regularCount)
+        repeat(pinnedCount) { chosen += pinned[it % pinned.size] }
+        val shuffledOthers = others.shuffled(random).take(otherCount)
+        val size = shuffledOthers.size + chosen.size
+        val slots = (0 until size).shuffled(random).take(chosen.size).toSet()
+        val guests = chosen.shuffled(random)
+        var nextOther = 0
+        var nextGuest = 0
+        return List(size) { index -> if (index in slots) guests[nextGuest++] else shuffledOthers[nextOther++] }
+    }
+
     fun applyYouTubeMixWeight(
         media: List<AerialMedia>,
         youtubeWeight: Int,

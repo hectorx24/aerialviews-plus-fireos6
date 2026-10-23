@@ -56,6 +56,16 @@ class YouTubeSettingsFragment : MenuStateFragment() {
     ) {
         setPreferencesFromResource(R.xml.sources_youtube_settings, rootKey)
         setupPreferences()
+        findPreference<Preference>("yt_play_now")?.setOnPreferenceClickListener {
+            val ids = com.neilturner.aerialviews.providers.youtube.EndCutPolicy.pinnedIds(requireContext())
+            AlertDialog.Builder(requireContext())
+                .setTitle("Mis enlaces")
+                .setItems(ids.toTypedArray()) { _, which ->
+                    YouTubeVideoPrefs.startWith = ids[which]
+                    startActivity(android.content.Intent(requireContext(), com.neilturner.aerialviews.ui.screensaver.TestActivity::class.java))
+                }.show()
+            true
+        }
         // No manual size paint here: libraryState (DB-backed, emitted from
         // the repository init) draws the counter. onResume() below kicks a
         // refresh when the persisted count is still pending.
