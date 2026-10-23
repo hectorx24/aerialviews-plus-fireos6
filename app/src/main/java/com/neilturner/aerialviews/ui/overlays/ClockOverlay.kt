@@ -18,9 +18,9 @@ class ClockOverlay : TextClock {
 
     /** Large, condensed, thin, one uniform translucent white: it takes whatever the video behind it gives, no painted gradient. */
     fun applyGlassStyle() {
-        typeface = android.graphics.Typeface.create("sans-serif-condensed-light", android.graphics.Typeface.NORMAL)
+        typeface = android.graphics.Typeface.create("sans-serif-condensed", android.graphics.Typeface.NORMAL)
         setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 72f)
-        setTextColor(android.graphics.Color.argb(165, 255, 255, 255))
+        setTextColor(android.graphics.Color.argb(105, 255, 255, 255))
         setShadowLayer(0f, 0f, 0f, 0)
         includeFontPadding = false
         letterSpacing = 0.04f

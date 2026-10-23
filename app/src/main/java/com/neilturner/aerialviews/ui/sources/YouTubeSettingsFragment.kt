@@ -62,7 +62,10 @@ class YouTubeSettingsFragment : MenuStateFragment() {
                 .setTitle("Mis enlaces")
                 .setItems(ids.toTypedArray()) { _, which ->
                     YouTubeVideoPrefs.startWith = ids[which]
-                    startActivity(android.content.Intent(requireContext(), com.neilturner.aerialviews.ui.screensaver.TestActivity::class.java))
+                    // Wait for the remote's key-up: the screensaver closes on any key.
+                    view?.postDelayed({
+                        if (isAdded) startActivity(android.content.Intent(requireContext(), com.neilturner.aerialviews.ui.screensaver.TestActivity::class.java))
+                    }, 700)
                 }.show()
             true
         }

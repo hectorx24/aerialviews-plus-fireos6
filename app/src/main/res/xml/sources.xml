@@ -2,6 +2,11 @@
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <Preference
+        app:title="YouTube: porcentajes, mis enlaces y reproducir"
+        app:summary="Mezcla con Apple TV, tus enlaces con corte automático, reproducir uno ahora"
+        app:fragment="com.neilturner.aerialviews.ui.sources.YouTubeSettingsFragment"/>
+
     <PreferenceCategory app:title="@string/sources_mode_category_title">
         <ListPreference
             app:key="source_mode"
@@ -49,11 +54,6 @@
             app:title="@string/sources_custom_feed_title"
             app:summary="@string/sources_custom_feed_summary"
             app:fragment="com.neilturner.aerialviews.ui.sources.CustomFeedFragment"/>
-
-        <Preference
-            app:title="@string/sources_youtube_title"
-            app:summary="@string/sources_youtube_summary"
-            app:fragment="com.neilturner.aerialviews.ui.sources.YouTubeSettingsFragment"/>
 
         <ListPreference
             app:key="yt_mix_weight"
